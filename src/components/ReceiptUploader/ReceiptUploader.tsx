@@ -18,7 +18,7 @@ import ReceiptDetails from './ReceiptDetails';
 const ALLOWED_FORMATS = ['.jpg', '.jpeg', '.png'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const BANKS = ['Bank A', 'Bank B', 'Bank C', 'Other'];
+const BANKS = ['Papara', 'Garanti Bankası']
 
 const ReceiptUploader: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
