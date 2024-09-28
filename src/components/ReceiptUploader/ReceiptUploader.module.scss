@@ -1,0 +1,21 @@
+.receipt-uploader {
+  max-width: 600px;
+  margin: 2rem auto;
+
+  :global(.cds--file-browse-btn) {
+    max-width: 100%;
+  }
+
+  :global(.cds--file-filename) {
+    max-width: calc(100% - 1rem);
+  }
+
+  :global(.cds--btn) {
+    margin-top: 1rem;
+  }
+
+  :global(.cds--inline-notification) {
+    max-width: 100%;
+    margin-top: 1rem;
+  }
+}

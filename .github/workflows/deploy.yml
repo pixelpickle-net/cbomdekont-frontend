@@ -1,0 +1,25 @@
+name: Deploy to Self-Hosted Machine
+
+on:
+  push:
+    branches:
+      - main # veya deploy etmek istediğiniz branch
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Docker images
+        env:
+          CF_TUNNEL_TOKEN: ${{ secrets.CF_TUNNEL_TOKEN }}
+        run: |
+          docker-compose build
+
+      - name: Deploy to self-hosted machine
+        env:
+          CF_TUNNEL_TOKEN: ${{ secrets.CF_TUNNEL_TOKEN }}
+        run: |
+          docker-compose down
+          docker-compose up -d
