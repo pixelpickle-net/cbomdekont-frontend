@@ -1,0 +1,4 @@
+url: http://web:80
+tunnel: dekont_tunnel
+credentials-file: /etc/cloudflared/cert.pem
+logfile: /etc/cloudflared/logfile.log
