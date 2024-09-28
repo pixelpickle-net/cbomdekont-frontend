@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useDropzone } from 'react-dropzone';
+import styles from './ReceiptUploader.module.css';
 import {
-  FileUploader,
   FileUploaderItem,
   Button,
   InlineLoading,
@@ -30,25 +31,48 @@ const ReceiptUploader: React.FC = () => {
   const [receiptDetails, setReceiptDetails] = useState<any>(null);
   const [notification, setNotification] = useState<{ type: string; message: string } | null>(null);
 
-  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      if (!ALLOWED_FORMATS.some(format => selectedFile.name.toLowerCase().endsWith(format))) {
-        setError('Invalid file format. Please upload a PDF, JPG, or PNG file.');
-        return;
-      }
-      if (selectedFile.size > MAX_FILE_SIZE) {
-        setError('File size exceeds 5MB limit.');
-        return;
-      }
-      setFile(selectedFile);
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
       setError(null);
     }
   }, []);
 
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      'image/*': ALLOWED_FORMATS,
+    },
+    maxSize: MAX_FILE_SIZE,
+    multiple: false,
+  });
+
+  const handlePaste = useCallback((event: ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (items) {
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const blob = items[i].getAsFile();
+          if (blob) {
+            setFile(blob);
+            setError(null);
+          }
+          break;
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('paste', handlePaste);
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+    };
+  }, [handlePaste]);
+
   const uploadFile = useCallback(async () => {
     if (!file || !bank) {
-      setError('Please select a file and bank before uploading.');
+      setError('Lütfen bir dosya ve banka seçin.');
       return;
     }
 
@@ -56,25 +80,24 @@ const ReceiptUploader: React.FC = () => {
     setError(null);
 
     try {
-      // Simulating API call
+      // API çağrısı simülasyonu
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Simulating API response
+      // API yanıtı simülasyonu
       const apiResponse = {
         name: "John Doe",
         amount: "$100.00",
         date: "2023-05-15",
         bank,
-        // ... other fields
       };
       
       setReceiptDetails(apiResponse);
       setIsSuccess(true);
       setIsModalOpen(true);
-      setNotification({ type: 'success', message: 'Receipt uploaded successfully!' });
+      setNotification({ type: 'success', message: 'Fiş başarıyla yüklendi!' });
     } catch (err) {
-      setError('An error occurred while uploading the file. Please try again.');
-      setNotification({ type: 'error', message: 'Failed to upload receipt. Please try again.' });
+      setError('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+      setNotification({ type: 'error', message: 'Fiş yüklenemedi. Lütfen tekrar deneyin.' });
     } finally {
       setIsUploading(false);
     }
@@ -91,66 +114,62 @@ const ReceiptUploader: React.FC = () => {
   return (
     <Grid narrow>
       <Column lg={16} md={8} sm={4}>
-        <div className="receipt-uploader">
-          <h2 className="page-title">
-            <Document size={24} className="icon-spacing" />
-            Upload Receipt
+        <div className={styles.receiptUploader}>
+          <h2 className={styles.pageTitle}>
+            <Document size={24} className={styles.iconSpacing} />
+            Fiş Yükle
           </h2>
-          {!file && (
-            <FileUploader
-              accept={ALLOWED_FORMATS}
-              buttonKind="primary"
-              buttonLabel="Select file"
-              filenameStatus="edit"
-              iconDescription="Clear file"
-              labelDescription="Max file size is 5MB. Only .jpg, .jpeg, .png, and .pdf files are supported."
-              labelTitle="Upload receipt"
-              onChange={handleFileChange}
-            />
-          )}
-          {file && !isSuccess && (
-            <>
+          <div
+            {...getRootProps()}
+            className={`${styles.dropzone} ${isDragActive ? styles.active : ''}`}
+          >
+            <input {...getInputProps()} />
+            {file ? (
               <FileUploaderItem
                 name={file.name}
                 status="edit"
-                iconDescription="Clear file"
+                iconDescription="Dosyayı temizle"
                 onDelete={resetUpload}
                 invalid={!!error}
                 errorSubject={error || ''}
               />
-              <Grid narrow>
-                <Column lg={8} md={4} sm={4}>
-                  <Select
-                    id="bank"
-                    labelText="Bank"
-                    value={bank}
-                    onChange={(e) => setBank(e.target.value)}
-                  >
-                    <SelectItem disabled hidden value="" text="Choose an option" />
-                    {BANKS.map((bankName) => (
-                      <SelectItem key={bankName} value={bankName} text={bankName} />
-                    ))}
-                  </Select>
-                </Column>
-              </Grid>
+            ) : isDragActive ? (
+              <p>Dosyayı buraya bırakın...</p>
+            ) : (
+              <p>Bir dosya sürükleyip bırakın veya buraya tıklayarak seçin, ya da bir görüntüyü yapıştırın (Ctrl+V)</p>
+            )}
+          </div>
+          {file && !isSuccess && (
+            <>
+              <Select
+                id="bank"
+                labelText="Banka"
+                value={bank}
+                onChange={(e) => setBank(e.target.value)}
+              >
+                <SelectItem disabled hidden value="" text="Bir seçenek seçin" />
+                {BANKS.map((bankName) => (
+                  <SelectItem key={bankName} value={bankName} text={bankName} />
+                ))}
+              </Select>
               {!error && (
                 <Button
                   renderIcon={Upload}
                   onClick={uploadFile}
                   disabled={isUploading || !bank}
                 >
-                  {isUploading ? 'Uploading...' : 'Upload Receipt'}
+                  {isUploading ? 'Yükleniyor...' : 'Fişi Yükle'}
                 </Button>
               )}
               {isUploading && (
-                <InlineLoading description="Uploading receipt..." />
+                <InlineLoading description="Fiş yükleniyor..." />
               )}
             </>
           )}
           {error && (
             <InlineNotification
               kind="error"
-              title="Error:"
+              title="Hata:"
               subtitle={error}
               lowContrast
             />
@@ -159,9 +178,9 @@ const ReceiptUploader: React.FC = () => {
       </Column>
       <Modal
         open={isModalOpen}
-        modalHeading="Upload Successful"
-        primaryButtonText="Upload Another"
-        secondaryButtonText="Close"
+        modalHeading="Yükleme Başarılı"
+        primaryButtonText="Başka Yükle"
+        secondaryButtonText="Kapat"
         onRequestSubmit={() => {
           setIsModalOpen(false);
           resetUpload();
@@ -174,10 +193,10 @@ const ReceiptUploader: React.FC = () => {
         <ReceiptDetails details={receiptDetails} />
       </Modal>
       {notification && (
-        <div className="notification-container">
+        <div className={styles.notificationContainer}>
           <ToastNotification
             kind={notification.type as any}
-            title={notification.type === 'success' ? 'Success' : 'Error'}
+            title={notification.type === 'success' ? 'Başarılı' : 'Hata'}
             subtitle={notification.message}
             timeout={5000}
             onClose={() => setNotification(null)}

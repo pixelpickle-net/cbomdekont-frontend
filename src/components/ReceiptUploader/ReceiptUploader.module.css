@@ -1,0 +1,43 @@
+.receiptUploader {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.pageTitle {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.iconSpacing {
+  margin-right: 0.5rem;
+}
+
+.dropzone {
+  border: 2px dashed #8d8d8d;
+  border-radius: 4px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border .24s ease-in-out;
+  margin-bottom: 1.5rem;
+}
+
+.dropzone:hover {
+  border-color: #0f62fe;
+}
+
+.dropzone.active {
+  border-color: #0f62fe;
+  background-color: #edf5ff;
+}
+
+.notificationContainer {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 9999;
+}
