@@ -19,7 +19,7 @@ import ReceiptDetails from './ReceiptDetails';
 const ALLOWED_FORMATS = ['.jpg', '.jpeg', '.png'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const BANKS = ['Papara', 'Garanti Bankası']
+const BANKS = ['Papara', 'Garanti Bank']
 
 const ReceiptUploader: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -72,7 +72,7 @@ const ReceiptUploader: React.FC = () => {
 
   const uploadFile = useCallback(async () => {
     if (!file || !bank) {
-      setError('Lütfen bir dosya ve banka seçin.');
+      setError('Please select a file and a bank.');
       return;
     }
 
@@ -80,10 +80,10 @@ const ReceiptUploader: React.FC = () => {
     setError(null);
 
     try {
-      // API çağrısı simülasyonu
+      // API call simulation
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // API yanıtı simülasyonu
+      // API response simulation
       const apiResponse = {
         name: "John Doe",
         amount: "$100.00",
@@ -94,10 +94,10 @@ const ReceiptUploader: React.FC = () => {
       setReceiptDetails(apiResponse);
       setIsSuccess(true);
       setIsModalOpen(true);
-      setNotification({ type: 'success', message: 'Fiş başarıyla yüklendi!' });
+      setNotification({ type: 'success', message: 'Receipt uploaded successfully!' });
     } catch (err) {
-      setError('Dosya yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
-      setNotification({ type: 'error', message: 'Fiş yüklenemedi. Lütfen tekrar deneyin.' });
+      setError('An error occurred while uploading the file. Please try again.');
+      setNotification({ type: 'error', message: 'Failed to upload receipt. Please try again.' });
     } finally {
       setIsUploading(false);
     }
@@ -117,7 +117,7 @@ const ReceiptUploader: React.FC = () => {
         <div className={styles.receiptUploader}>
           <h2 className={styles.pageTitle}>
             <Document size={24} className={styles.iconSpacing} />
-            Fiş Yükle
+            Upload Receipt
           </h2>
           <div
             {...getRootProps()}
@@ -128,26 +128,26 @@ const ReceiptUploader: React.FC = () => {
               <FileUploaderItem
                 name={file.name}
                 status="edit"
-                iconDescription="Dosyayı temizle"
+                iconDescription="Clear file"
                 onDelete={resetUpload}
                 invalid={!!error}
                 errorSubject={error || ''}
               />
             ) : isDragActive ? (
-              <p>Dosyayı buraya bırakın...</p>
+              <p>Drop the file here...</p>
             ) : (
-              <p>Bir dosya sürükleyip bırakın veya buraya tıklayarak seçin, ya da bir görüntüyü yapıştırın (Ctrl+V)</p>
+              <p>Drag and drop a file here, or click to select a file, or paste an image (Ctrl+V)</p>
             )}
           </div>
           {file && !isSuccess && (
             <>
               <Select
                 id="bank"
-                labelText="Banka"
+                labelText="Bank"
                 value={bank}
                 onChange={(e) => setBank(e.target.value)}
               >
-                <SelectItem disabled hidden value="" text="Bir seçenek seçin" />
+                <SelectItem disabled hidden value="" text="Choose an option" />
                 {BANKS.map((bankName) => (
                   <SelectItem key={bankName} value={bankName} text={bankName} />
                 ))}
@@ -158,18 +158,18 @@ const ReceiptUploader: React.FC = () => {
                   onClick={uploadFile}
                   disabled={isUploading || !bank}
                 >
-                  {isUploading ? 'Yükleniyor...' : 'Fişi Yükle'}
+                  {isUploading ? 'Uploading...' : 'Upload Receipt'}
                 </Button>
               )}
               {isUploading && (
-                <InlineLoading description="Fiş yükleniyor..." />
+                <InlineLoading description="Uploading receipt..." />
               )}
             </>
           )}
           {error && (
             <InlineNotification
               kind="error"
-              title="Hata:"
+              title="Error:"
               subtitle={error}
               lowContrast
             />
@@ -178,9 +178,9 @@ const ReceiptUploader: React.FC = () => {
       </Column>
       <Modal
         open={isModalOpen}
-        modalHeading="Yükleme Başarılı"
-        primaryButtonText="Başka Yükle"
-        secondaryButtonText="Kapat"
+        modalHeading="Upload Successful"
+        primaryButtonText="Upload Another"
+        secondaryButtonText="Close"
         onRequestSubmit={() => {
           setIsModalOpen(false);
           resetUpload();
@@ -196,7 +196,7 @@ const ReceiptUploader: React.FC = () => {
         <div className={styles.notificationContainer}>
           <ToastNotification
             kind={notification.type as any}
-            title={notification.type === 'success' ? 'Başarılı' : 'Hata'}
+            title={notification.type === 'success' ? 'Success' : 'Error'}
             subtitle={notification.message}
             timeout={5000}
             onClose={() => setNotification(null)}
