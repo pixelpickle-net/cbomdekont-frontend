@@ -1,5 +1,8 @@
 # Build stage
-FROM node:18-alpine as build
+FROM node:18-alpine AS builder
+
+# Gerekli paketleri yükle
+RUN apk add --no-cache python3 make g++
 
 # Çalışma dizinini ayarla
 WORKDIR /app
@@ -17,13 +20,13 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:stable-alpine
+FROM nginx:alpine
+
+# Build çıktısını Nginx'in servis edeceği dizine kopyala
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx yapılandırmasını kopyala
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Build çıktısını Nginx'in servis edeceği dizine kopyala
-COPY --from=build /app/dist /usr/share/nginx/html
 
 # 80 portunu aç
 EXPOSE 80
