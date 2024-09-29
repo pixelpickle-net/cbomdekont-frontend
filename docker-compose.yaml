@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3'
 
 services:
   web:
@@ -6,10 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "9091:80"  # Dış port 9091'i iç port 80'e bağlıyoruz
+      - "9091:80"
     restart: unless-stopped
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    environment:
+      - VITE_APP_API_URL=http://app/api/v1/test
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -21,6 +23,12 @@ services:
     restart: unless-stopped
     depends_on:
       - web
+
+  app:
+    build: .
+    environment:
+      - VITE_APP_API_URL=http://app/api/v1/test
+    # ... diğer konfigürasyonlar
 
 networks:
   default:

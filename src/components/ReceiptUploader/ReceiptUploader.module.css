@@ -19,11 +19,10 @@
 .dropzone {
   border: 2px dashed #8d8d8d;
   border-radius: 4px;
-  padding: 2rem;
+  padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: border .24s ease-in-out;
-  margin-bottom: 1.5rem;
 }
 
 .dropzone:hover {
@@ -32,7 +31,6 @@
 
 .dropzone.active {
   border-color: #0f62fe;
-  background-color: #edf5ff;
 }
 
 .notificationContainer {
@@ -40,4 +38,11 @@
   bottom: 1rem;
   right: 1rem;
   z-index: 9999;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
 }

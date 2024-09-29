@@ -2,22 +2,22 @@ import React from 'react';
 import { StructuredListWrapper, StructuredListHead, StructuredListBody, StructuredListRow, StructuredListCell, Button } from '@carbon/react';
 import { Download } from '@carbon/icons-react';
 
-interface ReceiptDetailsProps {
-  details: {
-    name: string;
-    amount: string;
-    date: string;
-    receiptType: string;
-    bank: string;
-    [key: string]: string;
-  } | null;
+interface ExtractedInfo {
+  adSoyad?: string;
+  alici?: string;
+  islemNo?: string;
+  tarih?: string;
+  tutar?: string;  // Yeni eklenen tutar alanı
 }
 
-const ReceiptDetails: React.FC<ReceiptDetailsProps> = ({ details }) => {
-  if (!details) return null;
+interface ReceiptDetailsProps {
+  extractedInfo?: ExtractedInfo;
+}
 
+const ReceiptDetails: React.FC<ReceiptDetailsProps> = ({ extractedInfo }) => {
   const exportToCSV = () => {
-    const csvContent = Object.entries(details)
+    if (!extractedInfo) return;
+    const csvContent = Object.entries(extractedInfo)
       .map(([key, value]) => `${key},${value}`)
       .join('\n');
     
@@ -34,8 +34,12 @@ const ReceiptDetails: React.FC<ReceiptDetailsProps> = ({ details }) => {
     }
   };
 
+  if (!extractedInfo) {
+    return null;
+  }
+
   return (
-    <div>
+    <div className="receipt-details">
       <StructuredListWrapper>
         <StructuredListHead>
           <StructuredListRow head>
@@ -44,12 +48,26 @@ const ReceiptDetails: React.FC<ReceiptDetailsProps> = ({ details }) => {
           </StructuredListRow>
         </StructuredListHead>
         <StructuredListBody>
-          {Object.entries(details).map(([key, value]) => (
-            <StructuredListRow key={key}>
-              <StructuredListCell>{key}</StructuredListCell>
-              <StructuredListCell>{value}</StructuredListCell>
-            </StructuredListRow>
-          ))}
+          <StructuredListRow>
+            <StructuredListCell>Ad Soyad</StructuredListCell>
+            <StructuredListCell>{extractedInfo.adSoyad || 'N/A'}</StructuredListCell>
+          </StructuredListRow>
+          <StructuredListRow>
+            <StructuredListCell>Alıcı</StructuredListCell>
+            <StructuredListCell>{extractedInfo.alici || 'N/A'}</StructuredListCell>
+          </StructuredListRow>
+          <StructuredListRow>
+            <StructuredListCell>İşlem No</StructuredListCell>
+            <StructuredListCell>{extractedInfo.islemNo || 'N/A'}</StructuredListCell>
+          </StructuredListRow>
+          <StructuredListRow>
+            <StructuredListCell>Tarih</StructuredListCell>
+            <StructuredListCell>{extractedInfo.tarih || 'N/A'}</StructuredListCell>
+          </StructuredListRow>
+          <StructuredListRow>
+            <StructuredListCell>Tutar</StructuredListCell>
+            <StructuredListCell>{extractedInfo.tutar || 'N/A'}</StructuredListCell>
+          </StructuredListRow>
         </StructuredListBody>
       </StructuredListWrapper>
       <Button
