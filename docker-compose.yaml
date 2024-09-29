@@ -25,9 +25,7 @@ services:
       - web
 
   app:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    build: .
     environment:
       - VITE_APP_API_URL=http://app/api/v1/test
     # ... diğer konfigürasyonlar

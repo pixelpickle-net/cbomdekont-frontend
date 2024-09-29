@@ -1,32 +1,35 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:18-alpine as builder
 
-# Gerekli paketleri yükle
+# Gerekli araçları yükle
 RUN apk add --no-cache python3 make g++
 
 # Çalışma dizinini ayarla
 WORKDIR /app
 
-# package.json ve package-lock.json dosyalarını kopyala
+# Sadece package.json ve package-lock.json'ı kopyala
 COPY package*.json ./
 
-# Bağımlılıkları yükle
-RUN npm ci
+# npm ci yerine npm install kullan ve ek adımlar ekle
+RUN npm install && \
+    npm install @rollup/rollup-linux-x64-musl && \
+    npm rebuild && \
+    npm cache clean --force
 
-# Kaynak kodları kopyala
+# Geri kalan dosyaları kopyala
 COPY . .
 
-# Uygulamayı build et
+# Build işlemini çalıştır
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
-
-# Build çıktısını Nginx'in servis edeceği dizine kopyala
-COPY --from=builder /app/dist /usr/share/nginx/html
+FROM nginx:stable-alpine
 
 # Nginx yapılandırmasını kopyala
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Build çıktısını Nginx'in servis edeceği dizine kopyala
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # 80 portunu aç
 EXPOSE 80
