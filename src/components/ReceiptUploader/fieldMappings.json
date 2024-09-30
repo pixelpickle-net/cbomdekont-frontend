@@ -1,0 +1,11 @@
+{
+  "bimref": "BIM Reference",
+  "gonderenAdSoyad": "Sender Name",
+  "islRef": "Transaction Reference",
+  "tarih": "Date",
+  "tckn": "Turkish ID",
+  "alici": "Recipient",
+  "adSoyad": "Full Name",
+  "islemNo": "Transaction Number",
+  "tutar": "Amount"
+}

@@ -19,19 +19,16 @@ import axios from 'axios';
 import { AxiosError } from 'axios';
 import styles from './ReceiptUploader.module.css';
 import ReportRiskModal from './ReportRiskModal';
+import fieldMappings from './fieldMappings.json';
 
 interface ExtractedInfo {
-  "Full Name"?: string;
-  "Recipient"?: string;
-  "Transaction No"?: string;
-  "Date"?: string;
-  "Amount"?: string;
+  [key: string]: string;
 }
 
 const ALLOWED_FORMATS = ['.jpg', '.jpeg', '.png'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const BANKS = ['Papara', 'Garanti Bank']
+const BANKS = ['Papara', 'Halk Bank']
 
 const API_URL = import.meta.env.VITE_APP_API_URL || 'http://app/api/v1/test';
 
@@ -100,7 +97,22 @@ const ReceiptUploader: React.FC = () => {
 
     const formData = new FormData();
     formData.append('document', file);
-    formData.append('docType', 'papara');
+    
+    // Seçilen bankaya göre docType'ı ayarla
+    let docType = '';
+    switch (bank.toLowerCase()) {
+      case 'papara':
+        docType = 'papara';
+        break;
+      case 'halk bank':
+        docType = 'halkbank';
+        break;
+      default:
+        setError('Invalid bank selection');
+        setIsUploading(false);
+        return;
+    }
+    formData.append('docType', docType);
 
     try {
       const response = await axios.post(API_URL, formData, {
@@ -110,14 +122,18 @@ const ReceiptUploader: React.FC = () => {
       });
 
       if (response.data.success) {
-        const formattedInfo: ExtractedInfo = {
-          "Full Name": response.data.data.extractedInfo.adSoyad,
-          "Recipient": response.data.data.extractedInfo.alici,
-          "Transaction No": response.data.data.extractedInfo.islemNo,
-          "Date": response.data.data.extractedInfo.tarih,
-          "Amount": response.data.data.extractedInfo.tutar,
-        };
-        setExtractedInfo(formattedInfo);
+        const mappedInfo = Object.entries(response.data.data.extractedInfo).reduce((acc, [key, value]) => {
+          // value'nun string olduğunu kontrol ediyoruz
+          if (typeof value === 'string') {
+            acc[fieldMappings[key as keyof typeof fieldMappings] || key] = value;
+          } else {
+            // Eğer string değilse, string'e çeviriyoruz
+            acc[fieldMappings[key as keyof typeof fieldMappings] || key] = String(value);
+          }
+          return acc;
+        }, {} as ExtractedInfo);
+
+        setExtractedInfo(mappedInfo);
         setRiskStatus(response.data.data.riskStatus || 'Medium Risk');
         setIsSuccess(true);
         setIsModalOpen(true);
@@ -252,7 +268,7 @@ const ReceiptUploader: React.FC = () => {
                 resetUpload();
               }
             }}
-            receiptId={extractedInfo?.["Transaction No"] || ''}
+            receiptId={extractedInfo?.["Transaction Number"] || extractedInfo?.["Transaction Reference"] || ''}
             onReportRisk={handleReportRisk}
             onSubmitRiskReport={handleReportRiskSubmit}
           />
