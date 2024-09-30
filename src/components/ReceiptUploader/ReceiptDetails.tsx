@@ -5,11 +5,11 @@ import ReportRiskModal from './ReportRiskModal';
 import styles from './ReceiptDetails.module.css'; // Bu dosyayı oluşturacağız
 
 interface ExtractedInfo {
-  "Ad Soyad"?: string;
-  "Alıcı"?: string;
-  "İşlem No"?: string;
-  "Tarih"?: string;
-  "Tutar"?: string;
+  "Full Name"?: string;
+  "Recipient"?: string;
+  "Transaction No"?: string;
+  "Date"?: string;
+  "Amount"?: string;
 }
 
 interface ReceiptDetailsProps {

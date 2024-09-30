@@ -67,10 +67,10 @@ const ReportRiskModal: React.FC<ReportRiskModalProps> = ({
     <Modal
       open={isOpen}
       onRequestClose={onClose}
-      modalHeading="Riski Rapor Et"
-      modalLabel={`Makbuz ID: ${receiptId}`}
-      primaryButtonText="Rapor Et"
-      secondaryButtonText="İptal"
+      modalHeading="Report Risk"
+      modalLabel={`Receipt ID: ${receiptId}`}
+      primaryButtonText="Report"
+      secondaryButtonText="Cancel"
       onRequestSubmit={handleSubmit}
       primaryButtonDisabled={!riskType || !riskComment || isSubmitting}
       className={styles.reportRiskModal}
@@ -80,18 +80,18 @@ const ReportRiskModal: React.FC<ReportRiskModalProps> = ({
         <Stack gap={7}>
           <Select
             id="risk-type"
-            labelText="Risk Türü"
+            labelText="Risk Type"
             value={riskType}
             onChange={(e) => setRiskType(e.target.value)}
             required
           >
-            <SelectItem disabled hidden value="" text="Seçiniz" />
-            <SelectItem value="fraud" text="Dolandırıcılık" />
-            <SelectItem value="suspicious" text="Şüpheli İşlem" />
-            <SelectItem value="other" text="Diğer" />
+            <SelectItem disabled hidden value="" text="Select" />
+            <SelectItem value="fraud" text="Fraud" />
+            <SelectItem value="suspicious" text="Suspicious Transaction" />
+            <SelectItem value="other" text="Other" />
           </Select>
           <div className={styles.textAreaWrapper}>
-            <label htmlFor="risk-comment" className={styles.textAreaLabel}>Açıklama</label>
+            <label htmlFor="risk-comment" className={styles.textAreaLabel}>Description</label>
             <textarea
               id="risk-comment"
               value={riskComment}
@@ -105,7 +105,7 @@ const ReportRiskModal: React.FC<ReportRiskModalProps> = ({
           <div className={styles.warningContainer}>
             <WarningAlt className={styles.warningIcon} />
             <p className={styles.warningText}>
-              Bu rapor, ilgili makbuzun risk değerlendirmesinde kullanılacaktır. Lütfen doğru ve detaylı bilgi veriniz.
+              This report will be used in the risk assessment of the related receipt. Please provide accurate and detailed information.
             </p>
           </div>
         </Stack>

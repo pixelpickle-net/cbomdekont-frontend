@@ -21,11 +21,11 @@ import styles from './ReceiptUploader.module.css';
 import ReportRiskModal from './ReportRiskModal';
 
 interface ExtractedInfo {
-  "Ad Soyad"?: string;
-  "Alıcı"?: string;
-  "İşlem No"?: string;
-  "Tarih"?: string;
-  "Tutar"?: string;
+  "Full Name"?: string;
+  "Recipient"?: string;
+  "Transaction No"?: string;
+  "Date"?: string;
+  "Amount"?: string;
 }
 
 const ALLOWED_FORMATS = ['.jpg', '.jpeg', '.png'];
@@ -110,17 +110,15 @@ const ReceiptUploader: React.FC = () => {
       });
 
       if (response.data.success) {
-        // API'den gelen verileri yeni formata dönüştür
         const formattedInfo: ExtractedInfo = {
-          "Ad Soyad": response.data.data.extractedInfo.adSoyad,
-          "Alıcı": response.data.data.extractedInfo.alici,
-          "İşlem No": response.data.data.extractedInfo.islemNo,
-          "Tarih": response.data.data.extractedInfo.tarih,
-          "Tutar": response.data.data.extractedInfo.tutar,
+          "Full Name": response.data.data.extractedInfo.adSoyad,
+          "Recipient": response.data.data.extractedInfo.alici,
+          "Transaction No": response.data.data.extractedInfo.islemNo,
+          "Date": response.data.data.extractedInfo.tarih,
+          "Amount": response.data.data.extractedInfo.tutar,
         };
         setExtractedInfo(formattedInfo);
-        // Dummy risk durumu
-        setRiskStatus(response.data.data.riskStatus || 'Orta Risk');
+        setRiskStatus(response.data.data.riskStatus || 'Medium Risk');
         setIsSuccess(true);
         setIsModalOpen(true);
         setNotification({ type: 'success', message: 'Receipt uploaded successfully!' });
@@ -162,14 +160,13 @@ const ReceiptUploader: React.FC = () => {
 
   const handleReportRiskSubmit = async (riskType: string, riskComment: string) => {
     try {
-      // Dummy API çağrısı
       await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Risk raporu gönderildi:', { receiptId: selectedReceiptId, riskType, riskComment });
-      setNotification({ type: 'success', message: 'Risk raporu başarıyla gönderildi.' });
+      console.log('Risk report sent:', { receiptId: selectedReceiptId, riskType, riskComment });
+      setNotification({ type: 'success', message: 'Risk report sent successfully.' });
       setIsReportModalOpen(false);
     } catch (error) {
-      console.error('Risk raporu gönderilirken hata oluştu:', error);
-      setNotification({ type: 'error', message: 'Risk raporu gönderilirken bir hata oluştu.' });
+      console.error('Error sending risk report:', error);
+      setNotification({ type: 'error', message: 'An error occurred while sending the risk report.' });
     }
   };
 
@@ -255,7 +252,7 @@ const ReceiptUploader: React.FC = () => {
                 resetUpload();
               }
             }}
-            receiptId={extractedInfo?.["İşlem No"] || ''}
+            receiptId={extractedInfo?.["Transaction No"] || ''}
             onReportRisk={handleReportRisk}
             onSubmitRiskReport={handleReportRiskSubmit}
           />
