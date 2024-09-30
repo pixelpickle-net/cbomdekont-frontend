@@ -18,13 +18,14 @@ import ReceiptDetails from './ReceiptDetails';
 import axios from 'axios';
 import { AxiosError } from 'axios';
 import styles from './ReceiptUploader.module.css';
+import ReportRiskModal from './ReportRiskModal';
 
 interface ExtractedInfo {
-  adSoyad?: string;
-  alici?: string;
-  islemNo?: string;
-  tarih?: string;
-  tutar?: string;  // Yeni eklenen tutar alanı
+  "Ad Soyad"?: string;
+  "Alıcı"?: string;
+  "İşlem No"?: string;
+  "Tarih"?: string;
+  "Tutar"?: string;
 }
 
 const ALLOWED_FORMATS = ['.jpg', '.jpeg', '.png'];
@@ -45,6 +46,9 @@ const ReceiptUploader: React.FC = () => {
   const [notification, setNotification] = useState<{ type: string; message: string } | null>(null);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [riskStatus, setRiskStatus] = useState('');
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [selectedReceiptId, setSelectedReceiptId] = useState('');
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -106,7 +110,17 @@ const ReceiptUploader: React.FC = () => {
       });
 
       if (response.data.success) {
-        setExtractedInfo(response.data.data.extractedInfo);
+        // API'den gelen verileri yeni formata dönüştür
+        const formattedInfo: ExtractedInfo = {
+          "Ad Soyad": response.data.data.extractedInfo.adSoyad,
+          "Alıcı": response.data.data.extractedInfo.alici,
+          "İşlem No": response.data.data.extractedInfo.islemNo,
+          "Tarih": response.data.data.extractedInfo.tarih,
+          "Tutar": response.data.data.extractedInfo.tutar,
+        };
+        setExtractedInfo(formattedInfo);
+        // Dummy risk durumu
+        setRiskStatus(response.data.data.riskStatus || 'Orta Risk');
         setIsSuccess(true);
         setIsModalOpen(true);
         setNotification({ type: 'success', message: 'Receipt uploaded successfully!' });
@@ -141,119 +155,140 @@ const ReceiptUploader: React.FC = () => {
     setExtractedInfo(undefined);
   }, []);
 
+  const handleReportRisk = (receiptId: string) => {
+    setSelectedReceiptId(receiptId);
+    setIsReportModalOpen(true);
+  };
+
+  const handleReportRiskSubmit = async (riskType: string, riskComment: string) => {
+    try {
+      // Dummy API çağrısı
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Risk raporu gönderildi:', { receiptId: selectedReceiptId, riskType, riskComment });
+      setNotification({ type: 'success', message: 'Risk raporu başarıyla gönderildi.' });
+      setIsReportModalOpen(false);
+    } catch (error) {
+      console.error('Risk raporu gönderilirken hata oluştu:', error);
+      setNotification({ type: 'error', message: 'Risk raporu gönderilirken bir hata oluştu.' });
+    }
+  };
+
   return (
-    <Grid narrow className={styles.receiptUploader}>
-      <Column lg={16} md={8} sm={4}>
-        <h2 className={styles.pageTitle}>
-          <Document size={24} className={styles.iconSpacing} />
-          Upload Receipt
-        </h2>
-        <Form>
-          <Stack gap={7}>
-            <div
-              {...getRootProps()}
-              className={`${styles.dropzone} ${isDragActive ? styles.active : ''}`}
-            >
-              <input {...getInputProps()} />
-              {file ? (
-                <p>{file.name}</p>
-              ) : isDragActive ? (
-                <p>Drop the file here...</p>
-              ) : (
-                <p>Drag and drop a file here, or click to select a file</p>
+    <>
+      <Grid narrow className={styles.receiptUploader}>
+        <Column lg={16} md={8} sm={4}>
+          <h2 className={styles.pageTitle}>
+            <Document size={24} className={styles.iconSpacing} />
+            Upload Receipt
+          </h2>
+          <Form>
+            <Stack gap={7}>
+              <div
+                {...getRootProps()}
+                className={`${styles.dropzone} ${isDragActive ? styles.active : ''}`}
+              >
+                <input {...getInputProps()} />
+                {file ? (
+                  <p>{file.name}</p>
+                ) : isDragActive ? (
+                  <p>Drop the file here...</p>
+                ) : (
+                  <p>Drag and drop a file here, or click to select a file</p>
+                )}
+              </div>
+              {file && (
+                <Select
+                  id="bank"
+                  labelText="Bank"
+                  value={bank}
+                  onChange={(e) => setBank(e.target.value)}
+                >
+                  <SelectItem disabled hidden value="" text="Choose an option" />
+                  {BANKS.map((bankName) => (
+                    <SelectItem key={bankName} value={bankName} text={bankName} />
+                  ))}
+                </Select>
               )}
-            </div>
-            {file && (
-              <Select
-                id="bank"
-                labelText="Bank"
-                value={bank}
-                onChange={(e) => setBank(e.target.value)}
-              >
-                <SelectItem disabled hidden value="" text="Choose an option" />
-                {BANKS.map((bankName) => (
-                  <SelectItem key={bankName} value={bankName} text={bankName} />
-                ))}
-              </Select>
-            )}
-            {file && !isSuccess && !error && (
-              <Button
-                renderIcon={Upload}
-                onClick={uploadFile}
-                disabled={isUploading || !bank}
-                kind="primary"
-              >
-                {isUploading ? 'Uploading...' : 'Upload Receipt'}
-              </Button>
-            )}
-            {isUploading && (
-              <InlineLoading description="Uploading receipt..." />
-            )}
-            {error && (
-              <InlineNotification
-                kind="error"
-                title="Error:"
-                subtitle={error}
-                lowContrast
-              />
-            )}
-          </Stack>
-        </Form>
-      </Column>
-      <Modal
-        open={isModalOpen}
-        modalHeading="Upload Successful"
-        passiveModal
-        onRequestClose={() => {
-          setIsModalOpen(false);
-          resetUpload();
-        }}
-      >
-        <ReceiptDetails extractedInfo={extractedInfo} />
-        <div className={styles.modalButtons}>
-          <Button
-            kind="secondary"
-            onClick={() => {
+              {file && !isSuccess && !error && (
+                <Button
+                  renderIcon={Upload}
+                  onClick={uploadFile}
+                  disabled={isUploading || !bank}
+                  kind="primary"
+                >
+                  {isUploading ? 'Uploading...' : 'Upload Receipt'}
+                </Button>
+              )}
+              {isUploading && (
+                <InlineLoading description="Uploading receipt..." />
+              )}
+              {error && (
+                <InlineNotification
+                  kind="error"
+                  title="Error:"
+                  subtitle={error}
+                  lowContrast
+                />
+              )}
+            </Stack>
+          </Form>
+        </Column>
+        <Modal
+          open={isModalOpen}
+          modalHeading="Upload Successful"
+          passiveModal
+          onRequestClose={() => {
+            if (!isReportModalOpen) {
               setIsModalOpen(false);
               resetUpload();
+            }
+          }}
+          size="md"
+          preventCloseOnClickOutside
+        >
+          <ReceiptDetails 
+            extractedInfo={extractedInfo} 
+            riskStatus={riskStatus}
+            onClose={() => {
+              if (!isReportModalOpen) {
+                setIsModalOpen(false);
+                resetUpload();
+              }
             }}
-          >
-            Close
-          </Button>
-          <Button
-            kind="primary"
-            renderIcon={Add}
-            onClick={() => {
-              setIsModalOpen(false);
-              resetUpload();
-            }}
-          >
-            Upload Another
-          </Button>
-        </div>
-      </Modal>
-      <Modal
-        open={errorModalOpen}
-        modalHeading="Error"
-        primaryButtonText="OK"
-        onRequestSubmit={() => setErrorModalOpen(false)}
-        onRequestClose={() => setErrorModalOpen(false)}
-      >
-        <p>{errorMessage}</p>
-        <p>If the problem persists, please contact support.</p>
-      </Modal>
-      {notification && (
-        <div className={styles.notificationContainer}>
-          <ToastNotification
-            kind={notification.type as any}
-            title={notification.type === 'success' ? 'Success' : 'Error'}
-            subtitle={notification.message}
-            timeout={5000}
-            onClose={() => setNotification(null)}
+            receiptId={extractedInfo?.["İşlem No"] || ''}
+            onReportRisk={handleReportRisk}
+            onSubmitRiskReport={handleReportRiskSubmit}
           />
-        </div>
-      )}
-    </Grid>
+        </Modal>
+        <Modal
+          open={errorModalOpen}
+          modalHeading="Error"
+          primaryButtonText="OK"
+          onRequestSubmit={() => setErrorModalOpen(false)}
+          onRequestClose={() => setErrorModalOpen(false)}
+        >
+          <p>{errorMessage}</p>
+          <p>If the problem persists, please contact support.</p>
+        </Modal>
+        {notification && (
+          <div className={styles.notificationContainer}>
+            <ToastNotification
+              kind={notification.type as any}
+              title={notification.type === 'success' ? 'Success' : 'Error'}
+              subtitle={notification.message}
+              timeout={5000}
+              onClose={() => setNotification(null)}
+            />
+          </div>
+        )}
+      </Grid>
+      <ReportRiskModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        receiptId={selectedReceiptId}
+        onSubmit={handleReportRiskSubmit}
+      />
+    </>
   );
 };
 

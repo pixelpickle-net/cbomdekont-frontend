@@ -1,0 +1,37 @@
+.receiptDetails {
+  padding: 1rem;
+}
+
+.headerContainer {
+  margin-bottom: 1rem;
+}
+
+.riskNotification {
+  width: 100%;
+}
+
+.structuredList {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.actionButtonsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.rightButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.listHeader {
+  font-weight: bold;
+  text-transform: none;
+  color: #525252;
+  width: 30%;
+}
+
+/* Diğer mevcut stiller */
