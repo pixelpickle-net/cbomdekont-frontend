@@ -1,6 +1,6 @@
 import React from 'react';
 import { StructuredListWrapper, StructuredListHead, StructuredListBody, StructuredListRow, StructuredListCell, Button } from '@carbon/react';
-import { Download } from '@carbon/icons-react';
+import { Download, Copy } from '@carbon/icons-react';
 
 interface ExtractedInfo {
   adSoyad?: string;
@@ -32,6 +32,20 @@ const ReceiptDetails: React.FC<ReceiptDetailsProps> = ({ extractedInfo }) => {
       link.click();
       document.body.removeChild(link);
     }
+  };
+
+  const copyAllToClipboard = () => {
+    if (!extractedInfo) return;
+    const textContent = Object.entries(extractedInfo)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join('\n');
+    
+    navigator.clipboard.writeText(textContent).then(() => {
+      // Opsiyonel: Kopyalama başarılı olduğunda kullanıcıya bilgi verilebilir
+      console.log('Tüm bilgiler panoya kopyalandı');
+    }).catch(err => {
+      console.error('Kopyalama sırasında hata oluştu:', err);
+    });
   };
 
   if (!extractedInfo) {
@@ -70,13 +84,21 @@ const ReceiptDetails: React.FC<ReceiptDetailsProps> = ({ extractedInfo }) => {
           </StructuredListRow>
         </StructuredListBody>
       </StructuredListWrapper>
-      <Button
-        renderIcon={Download}
-        onClick={exportToCSV}
-        style={{ marginTop: '1rem' }}
-      >
-        Export to CSV
-      </Button>
+      <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem' }}>
+        <Button
+          renderIcon={Download}
+          onClick={exportToCSV}
+        >
+          Export to CSV
+        </Button>
+        <Button
+          renderIcon={Copy}
+          onClick={copyAllToClipboard}
+          kind="secondary"
+        >
+          Copy All
+        </Button>
+      </div>
     </div>
   );
 };
