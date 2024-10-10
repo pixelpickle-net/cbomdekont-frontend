@@ -97,14 +97,14 @@ const ReceiptDetails: React.FC<ReceiptDetailsProps> = ({
         >
           Report
         </Button>
-        <div className={styles.rightButtons}>
-          <Button renderIcon={Copy} onClick={copyAllToClipboard} size="sm" kind="ghost">
-            Copy All
-          </Button>
-          <Button onClick={onClose} size="sm">
-            Close
-          </Button>
-        </div>
+        <Button renderIcon={Copy} onClick={copyAllToClipboard} size="sm" kind="ghost">
+          Copy All
+        </Button>
+      </div>
+      <div className={styles.closeButtonContainer}>
+        <Button onClick={onClose} size="sm" className={styles.closeButton}>
+          Close
+        </Button>
       </div>
       
       <ReportRiskModal

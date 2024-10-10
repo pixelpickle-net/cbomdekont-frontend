@@ -19,11 +19,11 @@
 .dropzone {
   border: 2px dashed #8d8d8d;
   border-radius: 4px;
-  padding: 40px; /* Padding'i artırıyoruz */
+  padding: 20px; /* Padding'i azalttık */
   text-align: center;
   cursor: pointer;
   transition: border .24s ease-in-out;
-  min-height: 250px; /* Minimum yüksekliği artırıyoruz */
+  min-height: 180px; /* Minimum yüksekliği azalttık */
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -41,8 +41,14 @@
   margin-top: 2rem;
 }
 
+.closeButtonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
 .closeButton {
-  min-width: 120px; /* Düğmenin minimum genişliğini ayarlayın */
+  min-width: 120px;
 }
 
 /* Diğer mevcut stiller */
