@@ -187,7 +187,7 @@ const ReceiptUploader: React.FC = () => {
   };
 
   return (
-    <>
+    <div>
       <Grid narrow className={styles.receiptUploader}>
         <Column lg={16} md={8} sm={4}>
           <h2 className={styles.pageTitle}>
@@ -301,7 +301,7 @@ const ReceiptUploader: React.FC = () => {
         receiptId={selectedReceiptId}
         onSubmit={handleReportRiskSubmit}
       />
-    </>
+    </div>
   );
 };
 

@@ -46,3 +46,31 @@
   gap: 1rem;
   margin-top: 2rem;
 }
+
+.fileUploader {
+  min-height: 200px; /* Yüksekliği artırıyoruz */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem; /* Padding'i artırıyoruz */
+  border: 2px dashed #8d8d8d;
+  border-radius: 4px;
+  background-color: #f4f4f4;
+  transition: all 0.3s ease;
+}
+
+.fileUploader:hover {
+  background-color: #e8e8e8;
+  border-color: #0f62fe;
+}
+
+/* FileUploaderDropContainer bileşeninin içindeki metin stilini özelleştirme */
+.fileUploader :global(.cds--file-browse-btn) {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.fileUploader :global(.cds--file-browse-btn__drop-container) {
+  min-height: 180px; /* İç alanın yüksekliğini artırıyoruz */
+}
