@@ -19,18 +19,36 @@
 .dropzone {
   border: 2px dashed #8d8d8d;
   border-radius: 4px;
-  padding: 20px;
+  padding: 40px; /* Padding'i artırıyoruz */
   text-align: center;
   cursor: pointer;
   transition: border .24s ease-in-out;
+  min-height: 250px; /* Minimum yüksekliği artırıyoruz */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .dropzone:hover {
   border-color: #0f62fe;
+  background-color: #f4f4f4;
 }
 
 .dropzone.active {
   border-color: #0f62fe;
+  background-color: #e8e8e8;
+}
+
+.dropzone p {
+  margin: 10px 0;
+  font-size: 1.1rem;
+}
+
+.allowedFormats {
+  font-size: 0.9rem;
+  color: #6f6f6f;
+  margin-top: 10px;
 }
 
 .notificationContainer {

@@ -206,7 +206,11 @@ const ReceiptUploader: React.FC = () => {
                 ) : isDragActive ? (
                   <p>Drop the file here...</p>
                 ) : (
-                  <p>Drag and drop a file here, or click to select a file</p>
+                  <>
+                    <Upload size={32} />
+                    <p>Drag and drop a file here, or click to select a file</p>
+                    <p className={styles.allowedFormats}>Allowed formats: {ALLOWED_FORMATS.join(', ')}</p>
+                  </>
                 )}
               </div>
               {file && (
